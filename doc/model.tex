@@ -1,0 +1,38 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+
+\begin{document}
+
+\section*{Constantes}
+\begin{itemize}
+    \item Fontes \(S_d\): especialistas que passam conhecimento em \(d\);
+    \item Demandantes \(D_d\): quem precisa de conhecimento em \(d\);
+    \item Possivelmente peso \(w(v,d)\): criticidade da disciplina para o projeto do nó \(v\).
+\end{itemize}
+
+\section*{Variáveis}
+\[
+    x_e \in \{0,1\}, \quad e \in C,
+\]
+\[
+    r(v,d) \in \{0,1\}: \text{\(v\) é alcançado em \(d\)}.
+\]
+
+\section*{Objetivo}
+\[
+    \max \sum_d \sum_v w(v,d) \cdot r(v,d)
+\]
+
+\section*{Restrições}
+\[
+    \sum_{e \in C} x_e \le B
+\]
+\[
+    r(v,d) = 1 \quad \text{para } v \in S_d.
+\]
+
+Determinar se \(v\) é alcançado em \(d\) se existe caminho até \(v\) usando possivelmente limite de saltos; possivelmente máximo de conhecimento que sai de um especialista para não ligar tudo à mesma pessoa.
+
+\end{document}
