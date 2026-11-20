@@ -1,38 +1,81 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[brazilian]{babel}
 \usepackage{amsmath,amssymb}
 
 \begin{document}
 
-\section*{Constantes}
+\section*{Conjuntos}
 \begin{itemize}
-    \item Fontes \(S_d\): especialistas que passam conhecimento em \(d\);
-    \item Demandantes \(D_d\): quem precisa de conhecimento em \(d\);
-    \item Possivelmente peso \(w(v,d)\): criticidade da disciplina para o projeto do nó \(v\).
+    \item \(V\): conjunto de profissionais (nós);
+    \item \(\mathcal{D}\): conjunto de disciplinas;
+    \item \(E\): arestas existentes, \((u,v) \in E\) indica que o conhecimento flui de \(u\) para \(v\) (\(v\) busca conhecimento com \(u\));
+    \item \(C\): arestas candidatas, \(C \cap E = \emptyset\);
+    \item \(S_d \subseteq V\): fontes, especialistas que são referência em \(d\);
+    \item \(D_d \subseteq V\): demandantes, quem precisa de conhecimento em \(d\).
 \end{itemize}
 
-\section*{Variáveis}
+\section*{Parâmetros}
+\begin{itemize}
+    \item \(w_v \ge 0\): criticidade do nó \(v\);
+    \item \(c_e \in \mathbb{R}_{\ge 0}\): custo de ativação da aresta \(e \in C\);
+    \item \(B \in \mathbb{R}_{\ge 0}\): orçamento total de ativação;
+    \item \(K_u \in \mathbb{N}\): número máximo de nós que o especialista \(u\) pode atender por meio de arestas novas;
+    \item \(H \in \mathbb{N}\): limite de saltos para considerar um nó alcançado.
+\end{itemize}
+
+\section*{Variáveis de decisão}
 \[
-    x_e \in \{0,1\}, \quad e \in C,
+    x_e \in \{0,1\}, \quad e \in C \qquad (x_e = 1 \text{ se a aresta } e \text{ é ativada}),
 \]
 \[
-    r(v,d) \in \{0,1\}: \text{\(v\) é alcançado em \(d\)}.
+    r_{v,d}^{t} \in \{0,1\}, \quad v \in V,\; d \in \mathcal{D},\; t = 0,\dots,H \qquad (v \text{ é alcançado em } d \text{ em até } t \text{ saltos}),
+\]
+\[
+    y_{e,d}^{t} \in \{0,1\}, \quad e \in C,\; d \in \mathcal{D},\; t = 1,\dots,H \qquad (e \text{ propaga } d \text{ no salto } t).
 \]
 
 \section*{Objetivo}
 \[
-    \max \sum_d \sum_v w(v,d) \cdot r(v,d)
+    \max \sum_{d \in \mathcal{D}} \sum_{v \in D_d} w_v \, r_{v,d}^{H}
 \]
 
 \section*{Restrições}
+
+\paragraph{Orçamento.}
 \[
-    \sum_{e \in C} x_e \le B
-\]
-\[
-    r(v,d) = 1 \quad \text{para } v \in S_d.
+    \sum_{e \in C} c_e \, x_e \le B
 \]
 
-Determinar se \(v\) é alcançado em \(d\) se existe caminho até \(v\) usando possivelmente limite de saltos; possivelmente máximo de conhecimento que sai de um especialista para não ligar tudo à mesma pessoa.
+\paragraph{Capacidade dos especialistas.}
+\[
+    \sum_{e = (u,v) \in C} x_e \le K_u \qquad \forall u \in V
+\]
+
+\paragraph{Condição inicial (fontes).}
+\[
+    r_{v,d}^{0} = 
+    \begin{cases}
+        1, & v \in S_d \\
+        0, & \text{caso contrário}
+    \end{cases}
+    \qquad \forall v \in V,\; d \in \mathcal{D}
+\]
+
+\paragraph{Propagação com limite de saltos.}
+\[
+    r_{v,d}^{t} \le r_{v,d}^{t-1} 
+    + \sum_{(u,v) \in E} r_{u,d}^{t-1} 
+    + \sum_{e=(u,v) \in C} y_{e,d}^{t}
+    \qquad \forall v,\, d,\; t = 1,\dots,H
+\]
+\[
+    y_{e,d}^{t} \le x_e, \qquad y_{e,d}^{t} \le r_{u,d}^{t-1}
+    \qquad \forall e = (u,v) \in C,\; d,\; t = 1,\dots,H
+\]
+\[
+    r_{v,d}^{t} \ge r_{v,d}^{t-1} \qquad \forall v,\, d,\; t = 1,\dots,H
+\]
 
 \end{document}
