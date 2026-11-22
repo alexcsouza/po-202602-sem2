@@ -1,9 +1,7 @@
 import matplotlib.pyplot as plt
 import networkx as nx
 
-# G = nx.DiGraph()
-fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-G = nx.DiGraph(ax=ax)
+G = nx.Graph()
 
 G.add_edge("a", "b", weight=0.6)
 G.add_edge("a", "c", weight=0.2)
@@ -36,4 +34,6 @@ ax = plt.gca()
 ax.margins(0.08)
 plt.axis("off")
 plt.tight_layout()
-plt.show()
+plt.savefig("./img/network.png")
+
+# plt.show()
