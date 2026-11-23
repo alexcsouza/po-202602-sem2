@@ -1,91 +1,49 @@
 id,text,list
-1,Maxwell Holder,10
-2,Cody Anthony,"1, 4"
-3,Wallace Potts,"6, 7, 1"
-4,Justin Faulkner,8
-5,Upton Cardenas,1
-6,Lenore Wilcox,"9, 10, 6"
-7,Kyle Gentry,"7, 8"
-8,Graiden Contreras,"9, 2, 10"
-9,Brenden Larsen,9
-10,Beau Ford,"10, 1, 8, 3, 5"
-11,Desirae Fuentes,"10, 5, 1"
-12,August Cohen,"1, 4"
-13,Tanner Kramer,"8, 10, 6, 9"
-14,Xenos Cohen,"9, 5, 10, 3, 8"
-15,Phyllis Myers,2
-16,Phelan Lancaster,"9, 10, 5, 3"
-17,Indigo Norton,"6, 10, 9, 7"
-18,Xena Boyd,"6, 1"
-19,Madonna Guthrie,"4, 9, 6"
-20,Brooke Meadows,"2, 10, 6"
-21,Asher Patel,"10, 6"
-22,Ralph Lewis,"5, 2, 10, 3"
-23,Colette Moon,5
-24,Julian Mckee,"8, 10, 7, 6"
-25,Orla Chaney,"4, 7"
-26,Shaeleigh Stephenson,"3, 9, 4"
-27,Dante Farley,10
-28,Tatum Tillman,"1, 9, 7"
-29,Amity Neal,"7, 10"
-30,Kay Gates,"2, 6, 3, 5"
-31,Jonas Dillon,"7, 6, 1, 8"
-32,Ivor Bowen,6
-33,Kaitlin Wright,"3, 2, 5, 10, 6"
-34,Giacomo Boone,"8, 1, 10, 2, 3"
-35,Paul Wilkerson,"5, 4"
-36,Keith Martin,"9, 4, 2, 6"
-37,Roth Stewart,7
-38,Isaac Hickman,3
-39,Dennis Buchanan,"2, 3, 1, 6, 9"
-40,Irene Freeman,"10, 9, 6"
-41,Sonia Schneider,2
-42,Dorian Thornton,"9, 5"
-43,Caleb Phillips,"3, 4"
-44,Hedley Cote,6
-45,Keegan Booth,"10, 1"
-46,Iris Houston,6
-47,Paul Bird,2
-48,Ruby Joyner,"6, 1, 10, 4"
-49,Willa Allison,2
-50,Gage Cote,"8, 3, 4"
-51,Stella Branch,"1, 7, 8, 6"
-52,Leigh Leon,"5, 9, 4"
-53,Aristotle Stout,"1, 3"
-54,Ignacia Mckenzie,"9, 2, 1"
-55,Wyatt Welch,3
-56,Bruce Townsend,8
-57,Lani Harding,"9, 10"
-58,Len Maddox,9
-59,Jacob Perkins,"4, 7, 8"
-60,Elvis Logan,"5, 2, 4, 3"
-61,Berk Albert,"3, 6, 7, 2, 4"
-62,Matthew Olson,"9, 8, 6"
-63,Olivia Villarreal,9
-64,Juliet Bernard,"9, 8, 4, 3, 6"
-65,Petra Avila,"10, 8, 1, 7, 9"
-66,Micah Nielsen,"4, 7"
-67,Arden Lawrence,"10, 4, 2"
-68,Abel Meyers,3
-69,Basia Peck,"6, 7, 3, 1"
-70,Wanda Payne,"2, 8"
-71,Merrill Wheeler,"1, 6, 8"
-72,Adrian Mckinney,"5, 4, 7, 3"
-73,Buffy Lambert,"8, 3, 7, 5"
-74,Emma Mack,"3, 2, 9"
-75,Mariko Bridges,"4, 6, 9, 7"
-76,Jameson Watts,6
-77,Vincent Shelton,"3, 10, 1"
-78,Colton Evans,"10, 9"
-79,Lester Hays,"4, 9, 8"
-80,Clinton Clemons,"1, 8, 9"
-81,Travis Matthews,4
-82,Bradley Allen,"3, 5, 7"
-83,Hannah Finley,"6, 10, 1"
-84,Camille Benton,9
-85,Howard Bennett,"7, 3"
-86,Baxter Richardson,2
-87,Kenyon Green,8
-88,Austin Kemp,"1, 2"
-89,Duncan Ford,3
-90,Guinevere Fox,9
+1,Maxwell Holder,"2, 3, 5"
+2,Cody Anthony,1
+3,Justin Faulkner,"1, 3, 6"
+4,Lenore Wilcox,5
+5,Lucy Flores,4
+6,Graiden Contreras,6
+7,Beau Ford,"2, 3"
+8,August Cohen,1
+9,Xenos Cohen,"1, 3, 5"
+10,Gail Pierce,"3, 6"
+11,Phelan Lancaster,6
+12,Xena Boyd,"1, 4, 6"
+13,Madonna Guthrie,"1, 4, 5"
+14,Brooke Meadows,"1, 5, 6"
+15,Kermit Henry,1
+16,Ralph Lewis,3
+17,Andrew Preston,"3, 4, 6"
+18,Julian Mckee,"1, 4, 6"
+19,Orla Chaney,3
+20,Dante Farley,4
+21,Tatum Tillman,2
+22,Amity Neal,4
+23,Kay Gates,"1, 3, 6"
+24,Jonas Dillon,"2, 5"
+25,Ivor Bowen,"2, 5"
+26,Aurora Young,"4, 6"
+27,Kaitlin Wright,"2, 3, 4"
+28,Giacomo Boone,"2, 4"
+29,Paul Wilkerson,"2, 4"
+30,Keith Martin,"3, 5"
+31,Roth Stewart,"2, 6"
+32,Isaac Hickman,"1, 3, 5"
+33,Dennis Buchanan,"1, 2"
+34,Irene Freeman,"2, 3, 4"
+35,Sonia Schneider,"4, 5, 6"
+36,Dorian Thornton,"5, 6"
+37,Caleb Phillips,"1, 3, 5"
+38,Hedley Cote,"1, 5"
+39,Keegan Booth,"3, 5"
+40,Iris Houston,"5, 6"
+41,Paul Bird,6
+42,Ruby Joyner,"4, 6"
+43,Meredith Golden,"1, 3"
+44,Willa Allison,"1, 2"
+45,Gage Cote,4
+46,Stella Branch,6
+47,Leigh Leon,"1, 2"
+48,Aristotle Stout,"3, 4"
