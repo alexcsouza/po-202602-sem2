@@ -39,26 +39,21 @@ def load_list_csv(file_path):
     return list(reader)
 
 
-file_path_especialistas = f'{csv_base_path}/especialistas.csv'
-especialistas = load_list_csv(file_path_especialistas)
-
-file_path_demandantes = f'{csv_base_path}/demandantes.csv'
-demandantes = load_list_csv(file_path_demandantes)
-
-file_path_funcionarios = f'{csv_base_path}/funcionarios.csv'
-funcionarios = load_list_csv(file_path_funcionarios)
+# file_path_especialistas = f'{csv_base_path}/especialistas.csv'
+# especialistas = load_list_csv(file_path_especialistas)
+# 
+# file_path_demandantes = f'{csv_base_path}/demandantes.csv'
+# demandantes = load_list_csv(file_path_demandantes)
+# 
+# file_path_funcionarios = f'{csv_base_path}/funcionarios.csv'
+# funcionarios = load_list_csv(file_path_funcionarios)
 
 
 start_total = time.process_time()
 print(f"\n--- INÍCIO ---")
 start = time.process_time()
 
-
-
-
-
-
-B = 500.0              # orçamento total de ativação (mesma unidade da coluna custo)
+B = 1000.0              # orçamento total de ativação (mesma unidade da coluna custo)
 TEMPO_S = 300          # limite de tempo do solver
 GAP = 1e-4
 K = {}                 # máx. de arestas novas saindo de um nó, ex.: {7: 1}; vazio = sem limite
@@ -66,61 +61,18 @@ PESO = 1.0             # criticidade de cada demanda (não há coluna de peso no
 
 dados = carregar_dados("1")
 nos, fonte, demandas, existentes, candidatas = dados
-gerar_grafo(candidatas.keys(), [], "1-rede")
+gerar_grafo(candidatas.keys(), nos, [], "1-rede")
 resultado = main(B, TEMPO_S, GAP, K, PESO, dados, options, "1")
-gerar_grafo(candidatas.keys(), resultado["escolhidas"], "1-resultado")
-
+gerar_grafo(candidatas.keys(), nos, resultado["escolhidas"], "1-resultado")
 
 dados = carregar_dados("2")
 pprint(dados)
 nos, fonte, demandas, existentes, candidatas = dados
-gerar_grafo(candidatas.keys(), [], "2-rede")
+gerar_grafo(candidatas.keys(),nos, [], "2-rede")
 resultado = main(B, TEMPO_S, GAP, K, PESO, dados, options, "2")
-gerar_grafo(candidatas.keys(), resultado["escolhidas"], "2-resultado")
+gerar_grafo(candidatas.keys(), nos, resultado["escolhidas"], "2-resultado")
 
 
-# arestas = gerar_arestas(funcionarios)
-# nos = [(u) for (u, v, d) in funcionarios] 
-# marcados = [1, 90, 10]
-# gerar_grafo(arestas, nos, marcados)
-# 
-# 
-# # Example inputs
-# weights = np.random.randint(low=1, high=10, size=(len(nos)))
-# pprint(weights)
-# subsets = {f'{i}': row[2] for i, row in enumerate(funcionarios)}
-# max_select = 30
-# 
-# # Map each element to the subsets that cover it
-# covering_subsets = {
-#     i: [j for j, elems in subsets.items() if i in elems] for i in nos
-# }
-# 
-# model = gp.Model("max_coverage")
-# 
-# x = model.addVars(subsets.keys(), vtype=GRB.BINARY, name="x")
-# y = model.addVars(nos, vtype=GRB.BINARY, name="y")
-# 
-# model.setObjective(
-#     gp.quicksum(weights[int(i)] * y[i] for i in nos), GRB.MAXIMIZE
-# )
-# 
-# model.addConstrs(
-#     (y[i] <= gp.quicksum(x[j] for j in covering_subsets[i]) for i in nos),
-#     name="cover",
-# )
-# 
-# model.addConstr(gp.quicksum(x[j] for j in subsets) <= max_select, name="budget")
-# 
-# model.optimize()
-# 
-# if model.SolCount > 0:
-#   selected = [j for j in subsets if x[j].X > 0.5]
-#   covered = [i for i in nos if y[i].X > 0.5]
-#   print("Selected subsets:", selected)
-#   print("Covered nos:", covered)
-#   print("Total covered weight:", model.ObjVal)
-  
 
 end = time.process_time()
 print(f"\nTempo total: {end - start} segundos")
