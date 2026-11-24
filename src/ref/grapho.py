@@ -123,43 +123,30 @@ def gerar_arestas(funcionarios):
     return edges
 
 def gerar_grafo(arestas,nos, marcados, nome):
-    G = nx.MultiDiGraph()
-    # nos = extrair_nos(arestas)
+    G = nx.DiGraph()
     node_colors = ["blue"] * len(nos)
-    # edge_colors = arestas.copy() # {} #["blue"] * len(arestas)
-    
-    # pprint(arestas)
-    # pprint(nos)
-    # pprint(marcados)
-    # pprint(len(edge_colors))
-    # pprint(len(node_colors))
+
     for u in nos:
         G.add_node(u)
 
     for (u, v) in arestas:
         if (u, v) in marcados and 0 <= u < len(node_colors) and 0 <= v < len(node_colors):
             G.add_edge(u, v, color="red")
-            # pprint((u, v))
             node_colors[nos[u]] = 'red'
             node_colors[nos[v]] = 'red'
         else: 
             G.add_edge(u, v, color="blue")
-            # edge_colors[(u,v)] = 'red'
-            # edge_colors[(v,u)] = 'red'
 
     edges = G.edges()
-    # edge_colors = [G[u][v]['color'] for u,v in edges]
-    edge_colors = ["blue"] * len(arestas)
-    
-    pprint(edge_colors)
-    
-    # arestas = [(u, v, w) for (u, v, w) in G.edges(data=True)]
-    layers = dict(enumerate(nx.topological_generations(G)))
-    pos = nx.multipartite_layout(G, subset_key=layers)
+    #edge_colors = ["blue"] * len(arestas)
+    edge_colors = [G[u][v]['color'] for u,v in edges]
+
+    # layers = dict(enumerate(nx.topological_generations(G)))
+    # pos = nx.multipartite_layout(G, subset_key=layers)
+    pos = nx.spring_layout(G)
 
     # nodes
     nx.draw_networkx_nodes(G, pos, node_size=60, node_color=node_colors, margins=0.3)
-    # nx.draw_networkx_nodes(G, pos, node_size=60)
     
     # edges
     nx.draw_networkx_edges(G, pos, edgelist=arestas, width=1, arrows=True, arrowstyle="->", edge_color=edge_colors)
@@ -174,6 +161,7 @@ def gerar_grafo(arestas,nos, marcados, nome):
     plt.axis("off")
     plt.tight_layout()
     plt.savefig(f"./img/network-func-{nome}.png")
+    plt.clf()
 
 def extrair_nos(arestas):
     nos=[]
