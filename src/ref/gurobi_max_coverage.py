@@ -46,7 +46,7 @@ def ids_da_lista(texto):
     return [int(p) for p in texto.replace(";", ",").split(",") if p.strip()]
 
 
-def carregar_dados():
+def carregar_dados(nome_arq_arestas):
     funcionarios = ler("funcionarios.csv")
     nomes = {r["text"].strip(): int(r["id"]) for r in funcionarios}
     if len(nomes) != len(funcionarios):
@@ -60,6 +60,7 @@ def carregar_dados():
 
 
     fonte = defaultdict(set)
+
     for r in ler("especialistas.csv"):
         no = no_do(r["text"], "especialistas.csv")
         discs = ids_da_lista(r["list"])
@@ -79,7 +80,7 @@ def carregar_dados():
                 demandas[d].add(v)
 
     candidatas = {}
-    for r in ler("arestas.csv"):
+    for r in ler(f"arestas-{nome_arq_arestas}.csv"):
         u, v, c, p = int(r["origem"]), int(r["destino"]), float(r["custo"]), float(r["peso"])
         if u not in nomes.values() or v not in nomes.values():
             raise ValueError(f"aresta com nó desconhecido: {u} -> {v}")
@@ -172,7 +173,7 @@ def cobertura(fonte, demandas, existentes, escolhidas):
 
 
 
-def main(B, TEMPO_S, GAP, K, PESO, dados, options):
+def main(B, TEMPO_S, GAP, K, PESO, dados, options, nome):
     nos, fonte, demandas, existentes, candidatas = dados 
     total = sum(len(v) for v in demandas.values())
     n_esp = len(set().union(*fonte.values()))
@@ -209,12 +210,12 @@ def main(B, TEMPO_S, GAP, K, PESO, dados, options):
 
     pasta = RAIZ / "resultados"
     pasta.mkdir(exist_ok=True)
-    with open(pasta / "arestas_escolhidas.csv", "w", newline="", encoding="utf-8") as f:
+    with open(pasta / f"arestas_escolhidas-{nome}.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["origem", "destino", "custo"])
         for u, v in sorted(escolhidas):
             w.writerow([u, v, candidatas[u, v]])
-    print(f"\nsalvo em {pasta / 'arestas_escolhidas.csv'}")
+    print(f"\nsalvo em {pasta}/arestas_escolhidas-{nome}.csv")
     return {
         "escolhidas": escolhidas,
         "cobertas": cobertas,

@@ -58,19 +58,25 @@ start = time.process_time()
 
 
 
-B = 200.0              # orçamento total de ativação (mesma unidade da coluna custo)
+B = 500.0              # orçamento total de ativação (mesma unidade da coluna custo)
 TEMPO_S = 300          # limite de tempo do solver
 GAP = 1e-4
 K = {}                 # máx. de arestas novas saindo de um nó, ex.: {7: 1}; vazio = sem limite
 PESO = 1.0             # criticidade de cada demanda (não há coluna de peso nos CSV)
 
-dados = carregar_dados()
-
+dados = carregar_dados("1")
 nos, fonte, demandas, existentes, candidatas = dados
+gerar_grafo(candidatas.keys(), [], "1-rede")
+resultado = main(B, TEMPO_S, GAP, K, PESO, dados, options, "1")
+gerar_grafo(candidatas.keys(), resultado["escolhidas"], "1-resultado")
 
-#with gp.Env(params=options) as env, gp.Model(env=env) as m:
-resultado = main(B, TEMPO_S, GAP, K, PESO, dados, options)
 
+dados = carregar_dados("2")
+pprint(dados)
+nos, fonte, demandas, existentes, candidatas = dados
+gerar_grafo(candidatas.keys(), [], "2-rede")
+resultado = main(B, TEMPO_S, GAP, K, PESO, dados, options, "2")
+gerar_grafo(candidatas.keys(), resultado["escolhidas"], "2-resultado")
 
 
 # arestas = gerar_arestas(funcionarios)

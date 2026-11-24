@@ -1,0 +1,5 @@
+origem,destino,custo
+3,11,"{'custo': 28.05, 'peso': 0.5}"
+3,42,"{'custo': 43.61, 'peso': 0.5}"
+3,46,"{'custo': 27.24, 'peso': 0.5}"
+11,24,"{'custo': 27.69, 'peso': 0.5}"
