@@ -8,16 +8,26 @@ import networkx as nx
 import numpy as np
 import gurobipy as gp
 from gurobipy import GRB
+from ref.grapho import *
+from ref.gurobi_max_coverage import *
 
 import time
 import csv
+from configparser import ConfigParser  # ver. < 3.0
 
+# instantiate
+config = ConfigParser()
+
+# parse existing file
+config.read('gurobi.lic')
+options = {
+    "WLSACCESSID": config.get("license",'WLSACCESSID'),
+    "WLSSECRET": config.get("license",'WLSACCESSID'),
+    "LICENSEID": config.getint("license",'LICENSEID'),
+}
 
 # Pasta de dados
 csv_base_path = Path('./data/')
-
-print(csv_base_path)
-
 
 # Pasta de imagens
 img_base_path = Path('./img/')
@@ -43,144 +53,68 @@ start_total = time.process_time()
 print(f"\n--- INÍCIO ---")
 start = time.process_time()
 
-pprint(especialistas)
-
-pprint(demandantes)
-
-pprint(funcionarios)
-
-
-G = nx.DiGraph()
-
-# G = nx.balanced_tree(3, 5)
-# elarge = [(u, v) for (u, v, d) in G.edges(data=True) if d["weight"] > 0.5]
-
-# G = nx.karate_club_graph()
-
-# funcionarios = funcionarios[0:30]
-
-
-for n in funcionarios:
-    
-    pprint(n)
-    if n[2] == "":
-        continue
-    
-    dem = n[2].rsplit(", ")
-    n[2] = dem
-    for d in dem:
-        d = int(d)
-        pprint(f"{n[0]}->{d}")
-        G.add_edge(int(n[0]), int(d), weight=1 )
-        
-    
-    
-    
-
-arestas = [(u, v) for (u, v, d) in G.edges(data=True)]
-
-pprint(arestas)
-
-# elarge = [(u, v) for (u, v, d) in G.edges(data=True) if d["weight"] > 0.5]
-# esmall = [(u, v) for (u, v, d) in G.edges(data=True) if d["weight"] <= 0.5]
-  
-layers = dict(enumerate(nx.topological_generations(G)))
-pos = nx.multipartite_layout(G, subset_key=layers)
-
-# pos = nx.spring_layout(G, seed=100)  # positions for all nodes - seed for reproducibility
-# pos = nx.nx_agraph.graphviz_layout(G, prog="twopi", args="")
-
-
-# nodes
-nx.draw_networkx_nodes(G, pos, node_size=60)
-
-# edges
-nx.draw_networkx_edges(G, pos, edgelist=arestas, width=1, arrows=True, arrowstyle="->")
-
-
-# nx.draw_networkx_edges(
-#     G, pos, edgelist=esmall, width=6, alpha=0.5, edge_color="b", style="dashed"
-# )
-
-# node labels
-nx.draw_networkx_labels(G, pos, font_size=5, font_family="sans-serif")
-
-# edge weight labels
-# edge_labels = nx.get_edge_attributes(G, "weight")
-# nx.draw_networkx_edge_labels(G, pos, edge_labels, font_size=5)
-
-# nx.draw_circular(G, with_labels=True)
-
-ax = plt.gca()
-ax.width = 1600
-ax.height = 1200
-ax.margins(0.08)
-plt.axis("off")
-# plt.tight_layout()
-plt.savefig("./img/network-func.png")
 
 
 
 
 
+B = 200.0              # orçamento total de ativação (mesma unidade da coluna custo)
+TEMPO_S = 300          # limite de tempo do solver
+GAP = 1e-4
+K = {}                 # máx. de arestas novas saindo de um nó, ex.: {7: 1}; vazio = sem limite
+PESO = 1.0             # criticidade de cada demanda (não há coluna de peso nos CSV)
+
+dados = carregar_dados()
+
+nos, fonte, demandas, existentes, candidatas = dados
+
+#with gp.Env(params=options) as env, gp.Model(env=env) as m:
+resultado = main(B, TEMPO_S, GAP, K, PESO, dados, options)
 
 
 
-
-
-
-
-# Example inputs
-elements = [(u) for (u, v, d) in funcionarios]  # [0, 1, 2, 3, 4]
-pprint(elements)
-weights = np.random.randint(low=1, high=10, size=(len(elements)))
-pprint(weights)
-array_2d = np.array(G.edges())
-subsets = {f'S{i}': row[2] for i, row in enumerate(funcionarios)}
-pprint(subsets)
-# subsets = {
-#     "S1": [0, 1, 2],
-#     "S2": [1, 3],
-#     "S3": [2, 3, 4],
-#     "S4": [0, 4],
+# arestas = gerar_arestas(funcionarios)
+# nos = [(u) for (u, v, d) in funcionarios] 
+# marcados = [1, 90, 10]
+# gerar_grafo(arestas, nos, marcados)
+# 
+# 
+# # Example inputs
+# weights = np.random.randint(low=1, high=10, size=(len(nos)))
+# pprint(weights)
+# subsets = {f'{i}': row[2] for i, row in enumerate(funcionarios)}
+# max_select = 30
+# 
+# # Map each element to the subsets that cover it
+# covering_subsets = {
+#     i: [j for j, elems in subsets.items() if i in elems] for i in nos
 # }
-max_select = 30
-
-# Map each element to the subsets that cover it
-covering_subsets = {
-    i: [j for j, elems in subsets.items() if i in elems] for i in elements
-}
-
-model = gp.Model("max_coverage")
-
-x = model.addVars(subsets.keys(), vtype=GRB.BINARY, name="x")
-y = model.addVars(elements, vtype=GRB.BINARY, name="y")
-
-model.setObjective(
-    gp.quicksum(weights[int(i)] * y[i] for i in elements), GRB.MAXIMIZE
-)
-
-model.addConstrs(
-    (y[i] <= gp.quicksum(x[j] for j in covering_subsets[i]) for i in elements),
-    name="cover",
-)
-
-model.addConstr(gp.quicksum(x[j] for j in subsets) <= max_select, name="budget")
-
-model.optimize()
-
-if model.SolCount > 0:
-  selected = [j for j in subsets if x[j].X > 0.5]
-  covered = [i for i in elements if y[i].X > 0.5]
-  print("Selected subsets:", selected)
-  print("Covered elements:", covered)
-  print("Total covered weight:", model.ObjVal)
-
-
-
-
-
-
+# 
+# model = gp.Model("max_coverage")
+# 
+# x = model.addVars(subsets.keys(), vtype=GRB.BINARY, name="x")
+# y = model.addVars(nos, vtype=GRB.BINARY, name="y")
+# 
+# model.setObjective(
+#     gp.quicksum(weights[int(i)] * y[i] for i in nos), GRB.MAXIMIZE
+# )
+# 
+# model.addConstrs(
+#     (y[i] <= gp.quicksum(x[j] for j in covering_subsets[i]) for i in nos),
+#     name="cover",
+# )
+# 
+# model.addConstr(gp.quicksum(x[j] for j in subsets) <= max_select, name="budget")
+# 
+# model.optimize()
+# 
+# if model.SolCount > 0:
+#   selected = [j for j in subsets if x[j].X > 0.5]
+#   covered = [i for i in nos if y[i].X > 0.5]
+#   print("Selected subsets:", selected)
+#   print("Covered nos:", covered)
+#   print("Total covered weight:", model.ObjVal)
+  
 
 end = time.process_time()
 print(f"\nTempo total: {end - start} segundos")

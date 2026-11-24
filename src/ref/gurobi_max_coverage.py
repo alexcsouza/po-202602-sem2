@@ -37,14 +37,6 @@ RAIZ = Path(__file__).resolve().parents[2]     # raiz do projeto em src/ref
 DATA = RAIZ / "data"
 
 
-B = 400.0              # orçamento total de ativação (mesma unidade da coluna custo)
-TEMPO_S = 300          # limite de tempo do solver
-GAP = 1e-4
-K = {}                 # máx. de arestas novas saindo de um nó, ex.: {7: 1}; vazio = sem limite
-PESO = 1.0             # criticidade de cada demanda (não há coluna de peso nos CSV)
-
-
-
 def ler(nome):
     with open(DATA / nome, newline="", encoding="utf-8-sig") as f:
         return list(csv.DictReader(f))
@@ -88,11 +80,11 @@ def carregar_dados():
 
     candidatas = {}
     for r in ler("arestas.csv"):
-        u, v, c = int(r["origem"]), int(r["destino"]), float(r["custo"])
+        u, v, c, p = int(r["origem"]), int(r["destino"]), float(r["custo"]), float(r["peso"])
         if u not in nomes.values() or v not in nomes.values():
             raise ValueError(f"aresta com nó desconhecido: {u} -> {v}")
         if u != v:
-            candidatas[(u, v)] = c
+            candidatas[(u, v)] = {"custo": c, "peso": p}
 
     existentes = []        # os CSV não trazem rede existente; todas as arestas são candidatas
     return nos, dict(fonte), dict(demandas), existentes, candidatas
@@ -126,11 +118,15 @@ def construir(nos, fonte, demandas, existentes, candidatas, B, K=None, peso=1.0)
 
     m = gp.Model("max_coverage")
     x = m.addVars(sorted(candidatas), vtype=GRB.BINARY, name="x")
-    m.addConstr(gp.quicksum(candidatas[e] * x[e] for e in x) <= B, "orcamento")
+    p = m.addVars(sorted(candidatas), vtype=GRB.BINARY, name="p")
+    m.addConstr(gp.quicksum(candidatas[e]["custo"] * x[e] for e in x) <= B, "orcamento")
+    m.addConstr(gp.quicksum(candidatas[e]["peso"]  * p[e] for e in p) >= 4, f"criticidade")
+    
     for u, limite in K.items():
         saindo = [e for e in candidatas if e[0] == u]
         if saindo:
             m.addConstr(gp.quicksum(x[e] for e in saindo) <= limite, f"cap_{u}")
+            # m.addConstr(gp.quicksum(p[e] for e in saindo) >= 0.3, f"peso_{u}")
 
     objetivo = gp.LinExpr()
     r = {}
@@ -152,7 +148,8 @@ def construir(nos, fonte, demandas, existentes, candidatas, B, K=None, peso=1.0)
         for v in dem:
             r[d, v] = m.addVar(lb=0.0, ub=1.0, name=f"r[{d},{v}]")
             objetivo += peso * r[d, v]
-
+            # objetivo += candidatas[a]["peso"] * r[d, v]
+            
         entra, sai = defaultdict(list), defaultdict(list)
         for a in arcos:
             sai[a[0]].append(f[a])
@@ -175,8 +172,8 @@ def cobertura(fonte, demandas, existentes, escolhidas):
 
 
 
-def main():
-    nos, fonte, demandas, existentes, candidatas = carregar_dados()
+def main(B, TEMPO_S, GAP, K, PESO, dados, options):
+    nos, fonte, demandas, existentes, candidatas = dados 
     total = sum(len(v) for v in demandas.values())
     n_esp = len(set().union(*fonte.values()))
     print(f"{len(nos)} nós | {len(fonte)} disciplinas | {n_esp} especialistas | "
@@ -199,11 +196,12 @@ def main():
     escolhidas = [e for e in x if x[e].X > 0.5]
     cob = cobertura(fonte, demandas, existentes, escolhidas)
     cobertas = sum(len(v) for v in cob.values())
-    custo = sum(candidatas[e] for e in escolhidas)
-
+    custo = sum(candidatas[e]["custo"] for e in escolhidas)
+    peso = sum(candidatas[e]["peso"] for e in escolhidas)
+    limite_superior = m.ObjBound
     print(f"\nstatus: {'ÓTIMO' if m.Status == GRB.OPTIMAL else 'VIÁVEL (limite de tempo)'}"
-          f" | limite superior {m.ObjBound:.2f}")
-    print(f"arestas ativadas: {len(escolhidas)} | custo {custo:.2f} / B = {B:g}")
+          f" | limite superior {limite_superior:.2f}")
+    print(f"arestas ativadas: {len(escolhidas)} | custo {custo:.2f}/ peso {peso:.2f}  / B = {B:g}")
     print(f"demandas cobertas: {cobertas} de {total}  (Gurobi: {m.ObjVal / PESO:.0f})")
     print(f"{'disciplina':<12}{'especialistas':>14}{'demandas':>10}{'cobertas':>10}")
     for d in sorted(demandas):
@@ -217,7 +215,12 @@ def main():
         for u, v in sorted(escolhidas):
             w.writerow([u, v, candidatas[u, v]])
     print(f"\nsalvo em {pasta / 'arestas_escolhidas.csv'}")
-
+    return {
+        "escolhidas": escolhidas,
+        "cobertas": cobertas,
+        "total": total,
+        "limite_superior": limite_superior
+    }
 
 if __name__ == "__main__":
     main()
