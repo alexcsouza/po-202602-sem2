@@ -122,33 +122,31 @@ def gerar_arestas(funcionarios):
                 edges.append((int(n[0]), int(d), 1))
     return edges
 
-def gerar_grafo(arestas, nos, marcados):
+def gerar_grafo(arestas, marcados, nome):
     G = nx.DiGraph()
-    node_colors = ["blue"] * (len(nos) - 1) 
-    for u, v, w in arestas:
-        G.add_edge(u, v, weight=w)
-        if(u in marcados):
+    nos = extrair_nos(arestas)
+    node_colors = ["blue"] * len(nos)
+    edge_colors = ["blue"] * len(arestas) 
+    for (u, v) in arestas:
+        G.add_edge(u, v)
+        if (u, v) in marcados:
             node_colors[u] = 'red'
-
-        if(v in marcados):
             node_colors[v] = 'red'
-                        
-
+            edge_colors.append('red')
 
     # arestas = [(u, v, w) for (u, v, w) in G.edges(data=True)]
-    pprint(len(arestas))
-    pprint(len(node_colors))    
     layers = dict(enumerate(nx.topological_generations(G)))
     pos = nx.multipartite_layout(G, subset_key=layers)
 
     # nodes
-    nx.draw_networkx_nodes(G, pos, node_size=60, node_color=node_colors)
+    nx.draw_networkx_nodes(G, pos, node_size=60, node_color=node_colors, margins=0.3)
+    # nx.draw_networkx_nodes(G, pos, node_size=60)
     
     # edges
-    nx.draw_networkx_edges(G, pos, edgelist=arestas, width=1, arrows=True, arrowstyle="->")
+    nx.draw_networkx_edges(G, pos, edgelist=arestas, width=1, arrows=True, arrowstyle="->", edge_color=edge_colors)
     
     # node labels
-    nx.draw_networkx_labels(G, pos, font_size=5, font_family="sans-serif")
+    nx.draw_networkx_labels(G, pos, font_size=5, font_family="sans-serif", font_color='white')
     
     ax = plt.gca()
     ax.width = 1600
@@ -156,4 +154,13 @@ def gerar_grafo(arestas, nos, marcados):
     ax.margins(0.08)
     plt.axis("off")
     plt.tight_layout()
-    plt.savefig("./img/network-func.png")
+    plt.savefig(f"./img/network-func-{nome}.png")
+
+def extrair_nos(arestas):
+    nos=[]
+    for (u, v) in arestas:
+        if u not in nos:
+            nos.append(u)
+        if v not in nos:
+            nos.append(v)
+    return nos

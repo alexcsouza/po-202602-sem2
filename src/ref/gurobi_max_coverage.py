@@ -80,11 +80,11 @@ def carregar_dados():
 
     candidatas = {}
     for r in ler("arestas.csv"):
-        u, v, c, p = int(r["origem"]), int(r["destino"]), float(r["custo"]), float(r["peso"])
+        u, v, c = int(r["origem"]), int(r["destino"]), float(r["custo"])
         if u not in nomes.values() or v not in nomes.values():
             raise ValueError(f"aresta com nó desconhecido: {u} -> {v}")
         if u != v:
-            candidatas[(u, v)] = {"custo": c, "peso": p}
+            candidatas[(u, v)] = c
 
     existentes = []        # os CSV não trazem rede existente; todas as arestas são candidatas
     return nos, dict(fonte), dict(demandas), existentes, candidatas
@@ -118,9 +118,9 @@ def construir(nos, fonte, demandas, existentes, candidatas, B, K=None, peso=1.0)
 
     m = gp.Model("max_coverage")
     x = m.addVars(sorted(candidatas), vtype=GRB.BINARY, name="x")
-    p = m.addVars(sorted(candidatas), vtype=GRB.BINARY, name="p")
-    m.addConstr(gp.quicksum(candidatas[e]["custo"] * x[e] for e in x) <= B, "orcamento")
-    m.addConstr(gp.quicksum(candidatas[e]["peso"]  * p[e] for e in p) >= 4, f"criticidade")
+    # p = m.addVars(sorted(candidatas), vtype=GRB.BINARY, name="p")
+    m.addConstr(gp.quicksum(candidatas[e] * x[e] for e in x) <= B, "orcamento")
+    # m.addConstr(gp.quicksum(candidatas[e]["peso"]  * p[e] for e in p) >= 4, f"criticidade")
     
     for u, limite in K.items():
         saindo = [e for e in candidatas if e[0] == u]
@@ -196,12 +196,12 @@ def main(B, TEMPO_S, GAP, K, PESO, dados, options):
     escolhidas = [e for e in x if x[e].X > 0.5]
     cob = cobertura(fonte, demandas, existentes, escolhidas)
     cobertas = sum(len(v) for v in cob.values())
-    custo = sum(candidatas[e]["custo"] for e in escolhidas)
-    peso = sum(candidatas[e]["peso"] for e in escolhidas)
+    custo = sum(candidatas[e] for e in escolhidas)
+    # peso = sum(candidatas[e]["peso"] for e in escolhidas)
     limite_superior = m.ObjBound
     print(f"\nstatus: {'ÓTIMO' if m.Status == GRB.OPTIMAL else 'VIÁVEL (limite de tempo)'}"
           f" | limite superior {limite_superior:.2f}")
-    print(f"arestas ativadas: {len(escolhidas)} | custo {custo:.2f}/ peso {peso:.2f}  / B = {B:g}")
+    print(f"arestas ativadas: {len(escolhidas)} | custo {custo:.2f} / B = {B:g}")
     print(f"demandas cobertas: {cobertas} de {total}  (Gurobi: {m.ObjVal / PESO:.0f})")
     print(f"{'disciplina':<12}{'especialistas':>14}{'demandas':>10}{'cobertas':>10}")
     for d in sorted(demandas):

@@ -58,20 +58,20 @@ start = time.process_time()
 
 
 
-B = 200.0              # orçamento total de ativação (mesma unidade da coluna custo)
+B = 500.0              # orçamento total de ativação (mesma unidade da coluna custo)
 TEMPO_S = 300          # limite de tempo do solver
 GAP = 1e-4
 K = {}                 # máx. de arestas novas saindo de um nó, ex.: {7: 1}; vazio = sem limite
 PESO = 1.0             # criticidade de cada demanda (não há coluna de peso nos CSV)
 
 dados = carregar_dados()
-
 nos, fonte, demandas, existentes, candidatas = dados
 
-#with gp.Env(params=options) as env, gp.Model(env=env) as m:
+gerar_grafo(candidatas.keys(), [], "1")
+
 resultado = main(B, TEMPO_S, GAP, K, PESO, dados, options)
 
-
+gerar_grafo(candidatas.keys(), resultado["escolhidas"], "2")
 
 # arestas = gerar_arestas(funcionarios)
 # nos = [(u) for (u, v, d) in funcionarios] 
