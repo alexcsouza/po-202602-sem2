@@ -37,7 +37,7 @@ RAIZ = Path(__file__).resolve().parents[2]     # raiz do projeto em src/ref
 DATA = RAIZ / "data"
 
 
-B = 400.0              # orçamento total de ativação (mesma unidade da coluna custo)
+B = 400              # orçamento total de ativação (mesma unidade da coluna custo)
 TEMPO_S = 300          # limite de tempo do solver
 GAP = 1e-4
 K = {}                 # máx. de arestas novas saindo de um nó, ex.: {7: 1}; vazio = sem limite
